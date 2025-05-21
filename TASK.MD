@@ -1,12 +1,13 @@
 # Siliwangi Sentry - Task Plan
 
 ## Session Focus
-Currently working on: T005 - Design Data Aggregation & Correlation Layer
-- [x] Initial outline of core processes, CDM, PostgreSQL, and OpenSearch strategy
-- [ ] Define detailed Common Data Model (CDM) entities and attributes
-- [ ] Specify PostgreSQL schema based on CDM
-- [ ] Detail OpenSearch indexing strategy and mappings
-- [ ] Outline correlation and deduplication logic
+Currently working on: T007 - Develop Web Dashboard (Backend - NestJS)
+- [x] Initialize/verify NestJS project structure for backend (`src/backend`) (incl. dependencies, TypeORM & OpenSearch client setup)
+- [x] Create core modules (e.g., `WorkspacesModule`, `AssetsModule`, `ScansModule`, `FindingsModule`, `ToolRunsModule`)
+- [x] Define DTOs (Data Transfer Objects) for API requests/responses for these modules
+- [ ] Implement basic CRUD services for main entities (PostgreSQL interaction using TypeORM or similar)
+- [ ] Setup initial API controllers and endpoints (as outlined conceptually in `ARCHITECTURE.MD` for workspace, and extend for other entities)
+- [ ] Implement basic OpenSearch interaction service (e.g., for indexing findings)
 
 ## Task Tracker
 
@@ -17,8 +18,8 @@ Currently working on: T005 - Design Data Aggregation & Correlation Layer
 | T002  | Define Workspace Management System              | HIGH     | COMPLETED   | T001         | 100%     |
 | T003  | Design Orchestration Engine                     | HIGH     | COMPLETED   | T002         | 100%     |
 | T004  | Specify Tool Execution Environment (Docker)     | HIGH     | COMPLETED   | T002, T003   | 100%     |
-| T005  | Design Data Aggregation & Correlation Layer     | MEDIUM   | IN_PROGRESS | T003         | 10%      |
-| T006  | Setup Database Backend (PostgreSQL & OpenSearch)| HIGH     | TODO        | T005         | 0%       |
+| T005  | Design Data Aggregation & Correlation Layer     | MEDIUM   | COMPLETED   | T003         | 100%     |
+| T006  | Setup Database Backend (PostgreSQL & OpenSearch)| HIGH     | COMPLETED   | T005         | 100%     |
 | T007  | Develop Web Dashboard (Backend - NestJS)        | HIGH     | TODO        | T006         | 0%       |
 | T008  | Develop Web Dashboard (Frontend - Vue.js)       | HIGH     | TODO        | T007         | 0%       |
 | T009  | Curate Initial Tooling Ecosystem List           | MEDIUM   | COMPLETED   | T001         | 100%     |

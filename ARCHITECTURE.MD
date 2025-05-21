@@ -183,7 +183,7 @@ As per **Decision D002**, Prefect Core is the chosen orchestration engine. This 
 *   Execute predefined and custom scan workflows (sequences of tool executions).
 *   Manage dependencies between tasks within a workflow.
 *   Parameterize tool executions using configurations from the workspace (`/workspace/tool_configs/` and `general_tool_settings.json`).
-*   Ensure tools read from and write to the correct workspace paths (`/workspace/shared_resources/` for input, `/workspace/tool_data/SCAN_ID/` for output).
+*   Ensure tools read from and write to the correct workspace paths (`/workspace/shared_resources/` for input, `/workspace/tool_data/{scan_id}/` for output).
 *   Report task status (success, failure, logs) back to the main platform (likely via the **[backend-nestjs]** which can then update the database and UI).
 
 **Backend to Orchestrator Communication (Refined):**
@@ -507,6 +507,7 @@ The PostgreSQL database will serve as the primary relational store for structure
     *   `end_time` (TIMESTAMPTZ, Nullable)
     *   `parameters` (JSONB, Nullable)
     *   `user_id` (UUID, Nullable) *Assuming a `users` table exists or will exist*
+    *   `workspace_id` (Foreign Key to Workspace)
     *   `description` (TEXT, Nullable)
     *   *Index on: `(workspace_id, status)`, `scan_type`, `trigger_type`, `user_id`*
 
@@ -654,6 +655,55 @@ This setup will enable:
 *   Correlation queries (e.g., find all critical vulnerabilities on external-facing web applications discovered in the last week).
 
 This strategy aims to balance data normalization in PostgreSQL for integrity with denormalization in OpenSearch for query performance and flexibility. The backend service acts as the bridge ensuring data consistency between the two.
+
+### 2.5.6 Correlation and Deduplication Logic
+
+This logic is crucial for creating a unified and actionable view of security data by preventing redundant information and linking related findings. It will primarily reside within the **[backend-nestjs]** service and be applied during the data processing pipeline after tool output parsing and before final storage/indexing.
+
+**1. Asset Correlation & Uniqueness:**
+
+*   **Goal**: Ensure each unique asset is represented by a single record in the `assets` table.
+*   **Strategy**: When a tool reports an asset (e.g., a domain, IP address, URL):
+    1.  **Normalize Identifier**: The asset's primary identifier (e.g., domain name, IP address) will be normalized (e.g., domains to lowercase, standardize IP representations).
+    2.  **Lookup**: Query the `assets` table in PostgreSQL for an existing asset with the same `type` and normalized `value` within the same `workspace_id`.
+        *   Example: `SELECT asset_id FROM assets WHERE workspace_id = ? AND type = 'DOMAIN' AND value = 'example.com'`.
+    3.  **Create or Update**: 
+        *   If an asset exists: Update its `last_seen` timestamp. Potentially merge/update `tags` or `attributes` if the new information is more comprehensive or recent. Log the new `source` if it's a different tool identifying the same asset.
+        *   If no asset exists: Create a new record in the `assets` table with `first_seen` and `last_seen` set to the current time, and populate other fields from the CDM.
+*   **Key Fields for Uniqueness**: Primarily `(workspace_id, type, value)`. For some asset types, additional attributes might contribute to uniqueness (e.g., for a `SERVICE` type, `(asset_id_of_host, port, protocol)`).
+
+**2. Finding/Vulnerability Deduplication:**
+
+*   **Goal**: Avoid multiple records for the exact same vulnerability instance on the same asset. This is more complex than asset deduplication due to the variety of details reported by different tools for similar issues.
+*   **Strategy (Iterative Approach)**:
+    1.  **Initial Strong Deduplication Keys**: Attempt to deduplicate based on a combination of highly specific fields. A new finding is considered a duplicate of an existing one if it matches ALL of the following for the SAME `asset_id` (and `workspace_id`):
+        *   `type` (e.g., VULNERABILITY, MISCONFIGURATION)
+        *   `title` (after normalization, e.g., case-insensitive, stripping minor variations if possible)
+        *   `cve_id` (if present and identical)
+        *   `cwe_id` (if present and identical)
+        *   A hash or key fields from `evidence` (e.g., for a web vulnerability, the vulnerable URL path and parameter name; for an exposed port, the port number and protocol). This requires careful definition per finding type.
+    2.  **Update Existing Finding**: If a strong match is found:
+        *   Update `last_seen` timestamp of the existing finding.
+        *   Log the new `tool_run_id` as an additional source that confirmed the finding (e.g., in a related table or a JSONB field in `findings`).
+        *   Potentially update `severity`, `cvss_score`, or `description` if the new report provides more accurate or severe information. The most severe report should take precedence, or a history of severities could be kept.
+        *   Update `status` if the new finding has a different status (e.g., a rescan now shows it as `REMEDIATED`).
+    3.  **Create New Finding**: If no strong match, create a new finding record.
+    4.  **Weak/Fuzzy Correlation (Future Enhancement)**: For more advanced scenarios, consider weaker correlation based on:
+        *   Similarity of `title` and `description` (e.g., using string similarity algorithms).
+        *   Overlapping `evidence` (e.g., same vulnerable component but slightly different paths).
+        *   This might not lead to deduplication into a single record but could link findings as "related" for easier analysis.
+*   **Normalization for Comparison**: Before comparison, relevant fields (`title`, paths in evidence) should be normalized (e.g., lowercase, remove trailing slashes, standardize URL schemes).
+*   **Tool-Specific Knowledge**: Parsers should try to extract stable identifiers if a tool provides them (e.g., a unique ID for a Nuclei template match).
+*   **Status Management**: The `status` of a finding (`OPEN`, `CLOSED`, `REMEDIATED`, `FALSE_POSITIVE`, `ACCEPTED_RISK`) will be critical. A new scan might re-open a previously closed finding or confirm a remediation.
+
+**3. Implementation Notes:**
+
+*   This logic will be part of the backend's data processing pipeline.
+*   Database queries for lookups need to be efficient, leveraging the indexes defined in the PostgreSQL schema.
+*   The process should be auditable, logging when findings are merged or new ones created.
+*   This is an area that will likely require refinement as more tools are integrated and real-world data patterns emerge.
+
+This concludes the initial design for the Data Aggregation & Correlation Layer (T005).
 
 ## 3. Component Interaction Flows
 

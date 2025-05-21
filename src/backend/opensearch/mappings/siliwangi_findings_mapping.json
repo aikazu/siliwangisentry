@@ -1,0 +1,67 @@
+{
+  "mappings": {
+    "properties": {
+      "finding_id": { "type": "keyword" },
+      "workspace_id": { "type": "keyword" },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": { "type": "keyword", "ignore_above": 256 }
+        }
+      },
+      "description": { "type": "text" },
+      "type": { "type": "keyword" },
+      "severity": { "type": "keyword" },
+      "status": { "type": "keyword" },
+      "confidence": { "type": "keyword" },
+      "cwe_id": { "type": "integer" },
+      "cve_id": { "type": "keyword" },
+      "cvss_score": { "type": "float" },
+      "cvss_vector": { "type": "keyword" },
+      "remediation_guidance": { "type": "text" },
+      "evidence_summary": { "type": "text" }, 
+      "tags": { "type": "keyword" },
+      "first_seen": { "type": "date" },
+      "last_seen": { "type": "date" },
+      "reported_at": { "type": "date" },
+      "additional_properties": { "type": "object", "dynamic": true },
+      "asset": {
+        "type": "object",
+        "properties": {
+          "asset_id": { "type": "keyword" },
+          "type": { "type": "keyword" },
+          "value": {
+            "type": "text",
+            "fields": {
+              "keyword": { "type": "keyword", "ignore_above": 1024 } 
+            }
+          },
+          "tags": { "type": "keyword" },
+          "attributes": { "type": "object", "dynamic": true }
+        }
+      },
+      "tool_run": {
+        "type": "object",
+        "properties": {
+          "tool_run_id": { "type": "keyword" },
+          "tool_name": { "type": "keyword" },
+          "tool_version": { "type": "keyword" },
+          "command_line": { "type": "text", "index": false } 
+        }
+      },
+      "scan": {
+        "type": "object",
+        "properties": {
+          "scan_id": { "type": "keyword" },
+          "scan_name": {
+            "type": "text",
+            "fields": {
+              "keyword": { "type": "keyword", "ignore_above": 256 }
+            }
+          },
+          "scan_type": { "type": "keyword" }
+        }
+      }
+    }
+  }
+} 
