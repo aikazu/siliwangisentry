@@ -1,0 +1,6 @@
+# Siliwangi Sentry Python Dependencies
+
+# Orchestration (Prefect Core)
+prefect>=2.0.0
+
+# Add other Python tool wrappers or utility libraries here as needed 

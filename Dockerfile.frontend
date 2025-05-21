@@ -1,0 +1,66 @@
+# Dockerfile for Siliwangi Sentry Frontend (Vue.js)
+
+# Stage 1: Build the application
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+# Copy root package.json and package-lock.json (ensure it exists for reproducible builds)
+COPY package.json ./package.json
+COPY package-lock.json ./package-lock.json
+
+# Copy frontend specific package.json
+COPY src/frontend/package.json ./src/frontend/package.json
+# If frontend has its own lock file (not typical with root lockfile), copy it too.
+# COPY src/frontend/package-lock.json ./src/frontend/package-lock.json
+
+# Install ALL dependencies using the root lockfile for the frontend workspace.
+# This ensures that devDependencies needed for the build are available.
+RUN npm ci --workspace=siliwangisentry-frontend
+
+# Copy frontend source code
+COPY src/frontend/ ./src/frontend/
+
+# Build the frontend application
+RUN npm run build --workspace=siliwangisentry-frontend
+
+# Stage 2: Production environment (using Nginx)
+FROM nginx:stable-alpine
+
+# It's a good practice to run Nginx as a non-root user, but requires more setup (nginx.conf changes, directory permissions).
+# For simplicity, we'll use the default Nginx user for now.
+
+# Default Nginx configuration directory
+WORKDIR /etc/nginx/
+
+# Remove default config
+RUN rm conf.d/default.conf
+
+# Copy custom Nginx configuration for SPA handling
+# A siliwangi.conf file should be created in the project root or src/frontend for this copy.
+# Example siliwangi.conf:
+# server {
+#    listen       80;
+#    server_name  localhost;
+#    root         /usr/share/nginx/html;
+#    index        index.html index.htm;
+#    location / {
+#        try_files $uri $uri/ /index.html;
+#    }
+#    # Optional: Add cache control headers for static assets
+#    location ~* \.(?:ico|css|js|gif|jpe?g|png)$ {
+#        expires 7d;
+#        add_header Pragma public;
+#        add_header Cache-Control "public";
+#    }
+# }
+COPY siliwangi.nginx.conf /etc/nginx/conf.d/siliwangi.conf
+
+# Copy built static files from builder stage to Nginx html directory
+COPY --from=builder /usr/src/app/src/frontend/dist /usr/share/nginx/html
+
+# Expose port
+EXPOSE 80
+
+# Command to run Nginx
+CMD ["nginx", "-g", "daemon off;"]

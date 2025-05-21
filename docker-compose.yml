@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: siliwangi_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-siliwangi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-siliwangipass}
+      POSTGRES_DB: ${POSTGRES_DB:-siliwangidb}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    restart: unless-stopped
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: siliwangi_opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting to 50% of server RAM
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536
+        hard: 65536
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - "${OPENSEARCH_PORT_HTTP:-9200}:9200"
+      - "${OPENSEARCH_PORT_TRANSPORT:-9300}:9300"
+    restart: unless-stopped
+
+  # Siliwangi Sentry Backend (NestJS)
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.backend
+  #   container_name: siliwangi_backend
+  #   ports:
+  #     - "${BACKEND_PORT:-3000}:3000"
+  #   depends_on:
+  #     - postgres
+  #     - opensearch
+  #   volumes:
+  #     - ./src/backend:/usr/src/app/src/backend
+  #     - /usr/src/app/node_modules # Anonymize node_modules
+  #   env_file:
+  #     - .env # For database connection strings etc.
+  #   restart: unless-stopped
+
+  # Siliwangi Sentry Frontend (Vue.js - served by Nginx for production, or dev server)
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frontend
+  #   container_name: siliwangi_frontend
+  #   ports:
+  #     - "${FRONTEND_PORT:-8080}:8080" # Or 80 if Nginx serves on port 80
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+
+  # Siliwangi Sentry Orchestrator (Prefect Agent/Server - if running locally)
+  # orchestrator:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.orchestrator # To be created
+  #   container_name: siliwangi_orchestrator
+  #   # volumes, ports, env_file as needed
+  #   restart: unless-stopped
+
+volumes:
+  postgres_data:
+  opensearch_data: 

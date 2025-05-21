@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+*.log
+.env
+
+# Specific to frontend if it has its own linting setup for Vue
+src/frontend/node_modules
+src/frontend/dist 

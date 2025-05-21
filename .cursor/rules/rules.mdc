@@ -1,0 +1,581 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Enhanced AI IDE Documentation Rules
+
+## 📚 Documentation Architecture
+
+### Core Documentation Hierarchy
+
+1. **Primary Documents** (Required for all projects)
+    
+    - `README.md` - Project entry point and overview
+    - `TASK.md` - Task tracking and management
+    - `STATE.md` - System state snapshots
+2. **Secondary Documents** (Recommended for medium/large projects)
+    
+    - `ARCHITECTURE.md` - System design and components
+    - `CHANGELOG.md` - Version history and changes
+    - `DECISIONS.md` - Key technical decisions log
+3. **Specialized Documents** (Create as needed)
+    
+    - `API-SPECS.md` - API documentation
+    - `TESTING.md` - Testing strategy and cases
+    - `MIGRATIONS.md` - Migration procedures
+    - `TECH-STACK.md` - Technology stack details
+    - `REFACTORING.md` - Refactoring initiatives
+    - `SUBTASK-{ID}.md` - Isolated component tasks
+
+### Documentation Cross-Referencing System
+
+- Use unique section IDs for all major components (`[section-id]`)
+- Link between documents using standardized references (`See [ARCHITECTURE.md#auth-flow]`)
+- Maintain a reference map in README.md with links to all active documents
+
+## 📄 Document Specifications
+
+### README.md
+
+- **Purpose**: Serve as the entry point and overview for the project
+- **Include**:
+    - Project name and concise description (1-2 sentences)
+    - Problem statement with clear value proposition
+    - Key features (3-5 bullet points)
+    - Quick start guide (installation + basic usage)
+    - Architecture overview diagram (as text description or link)
+    - Documentation map with links to other files
+    - Development environment setup
+    - License information
+    - Contribution guidelines
+- **Style**:
+    - Clear and concise language
+    - Code blocks for all commands and examples
+    - Progressive disclosure (most important information first)
+    - Visual hierarchy with proper markdown formatting
+- **Constraints**:
+    - Keep under 300 lines
+    - Update on significant architectural changes
+    - Ensure all quickstart instructions are verified
+
+### TASK.md
+
+- **Purpose**: Track current tasks, backlog items, and progress
+- **Include**:
+    - **Task Tracker** (Kanban-style):
+        
+```
+| ID    | Description        | Priority | Status      | Dependencies | Progress |
+|-------|--------------------|---------:|-------------|--------------|----------|
+| T001  | Implement login    | HIGH     | IN_PROGRESS | -            | 75%      |
+| T002  | Create user model  | MEDIUM   | TODO        | T001         | 0%       |
+```
+        
+    - **Active Session Focus**:
+        
+```
+## Session Focus
+Currently working on: T001 - Implementing login functionality
+- [x] Create login form
+- [x] Add form validation
+- [ ] Implement authentication logic
+- [ ] Add error handling
+```
+        
+    $ **Completed Tasks**:
+        
+```
+| ID    | Description        | Completed | Notes                    |
+|-------|--------------------|-----------:|-------------------------|
+| T000  | Project setup      | ✓         | Basic structure created  |
+```
+        
+- **Style**:
+    - Use progress indicators (percentages, checkboxes)
+    - Sort tasks by priority and dependencies
+    - Include blockers and impediments section
+- **Constraints**:
+    - Limit active tasks to 5-7 at a time
+    - Update at beginning and end of each session
+    - Move completed tasks with completion notes
+
+### STATE.md
+
+- **Purpose**: Capture system state at checkpoints
+- **Include**:
+    - Checkpoint identifier and timestamp marker
+    - Implementation status summary
+    - Active branches and component status
+    - Environment configuration
+    - Next steps upon resuming
+    - Visual progress map of components
+- **Style**:
+    - Component status visualization:
+        
+    ```
+    Authentication:  [███████░░░] 70%
+    User Management: [██████████] 100%
+    Data Processing: [░░░░░░░░░░] 0%
+    ```
+        
+    - Use checkpoint tables for tracking
+- **Constraints**:
+    - Generate before reaching conversation limits
+    - Include just enough context to resume effectively
+    - Limit to most recent 3 checkpoints
+
+### ARCHITECTURE.md
+
+- **Purpose**: Document system architecture and technical foundations
+- **Include**:
+    - System diagram with numbered components
+    - Component interaction flows
+    - Data model with entity relationships
+    - Design patterns and principles used
+    - Security architecture
+    - Performance considerations
+- **Style**:
+    - Use ASCII/text diagrams for architecture:
+        
+    ```
+    ┌────────────┐     ┌────────────┐     ┌────────────┐
+    │   Client   │────▶│    API     │────▶│  Database  │
+    └────────────┘     └────────────┘     └────────────┘
+    ```
+        
+    - Include decision matrices for major choices
+- **Constraints**:
+    - Update with each significant architectural change
+    - Document rationale for architectural decisions
+    - Use consistent component naming across diagrams
+
+### DECISIONS.md
+
+- **Purpose**: Log key technical and design decisions
+- **Include**:
+    - Decision record template:
+        
+
+```
+## Decision D001: Use JWT for Authentication
+
+**Context**: Need stateless authentication mechanism
+
+**Options Considered**:
+
+1. Session-based auth - ❌ Scaling issues with multiple servers
+2. JWT auth - ✅ Stateless and can work across services
+3. OAuth integration - ❌ Overly complex for current needs
+
+**Decision**: Implement JWT with 24-hour expiration
+
+**Consequences**: Need token refresh mechanism, must secure secret keys
+
+```
+        
+    - Decision status (Proposed, Accepted, Superseded)
+    - Links to related decisions and tasks
+- **Style**:
+    - Number decisions sequentially (D001, D002)
+    - Group by functional area when appropriate
+    - Include dated entry for each decision
+- **Constraints**:
+    - Document decisions at time they are made
+    - Update when decisions are revisited
+    - Include explicit trade-offs
+
+## 🔄 Session and State Management
+
+### Session Management Protocol
+
+1. **Session Initiation**:
+    
+    - Generate session identifier (S001, S002, etc.)
+    - Document session goals and focus
+    - Link to active tasks in TASK.md
+    - Outline expected outcomes
+2. **Active Session Tracking**:
+    
+    - Update task progress in real-time
+    - Document decisions as they occur
+    - Track files being modified
+    - Note blockers and questions
+3. **Session Handoff**:
+    
+    - Create state checkpoint before approaching limits
+    - Summarize progress and next steps
+    - Document any pending questions or decisions
+    - Generate continuation plan
+
+### Context Restoration Framework
+
+- **Quick Start Command**: Begin each session with `!resume` to generate status
+- **Context Loading Sequence**:
+    
+```
+## Context Loading
+
+1. Last session: Implemented user authentication flow
+2. Current focus: T003 - Password reset functionality
+3. Pending: Error handling for invalid tokens
+4. Files modified: auth.js, user.service.js
+```
+    
+- **Progress Visualization**: Auto-generate progress bars for active tasks
+
+### Checkpoint System
+
+- **Create automatic checkpoints** before:
+    
+    - Implementing complex algorithms
+    - Making architectural changes
+    - Approaching conversation limits
+    - Switching between major tasks
+- **Checkpoint format**:
+    
+    ```
+    ## Checkpoint CP005
+    
+    Status: Implementing password reset flow
+    Progress: 60% complete
+    Current file: auth.service.js:78
+    Next steps:
+    1. Add email validation
+    2. Implement token expiration check
+    3. Create success notification
+    ```
+    
+
+## 🧩 Task and Subtask Management
+
+### Task Definition Standards
+
+- **Task Structure**:
+    
+```
+## Task T001: Implement User Authentication
+
+Goal: Allow users to register and login
+Priority: HIGH
+Estimated complexity: MEDIUM
+
+Steps:
+1. Create user model
+2. Implement registration endpoint
+3. Add login validation
+4. Generate authentication tokens
+
+Acceptance criteria:
+- Users can register with email/password
+- Users receive JWT token on login
+- Invalid credentials return appropriate errors
+```
+    
+
+### Subtask Management
+
+- **Create subtasks** for components expected to take >1 session
+- **Link subtasks** with explicit dependencies
+- **Track progress** across subtask boundaries
+- **Isolate contexts** to enable independent work
+- **Format**:
+    
+```
+## Subtask ST001-A: User Registration Form
+
+Parent: T001 - User Authentication
+Dependencies: None
+Status: IN_PROGRESS
+
+Implementation:
+1. Create form component with validation
+2. Add password strength indicator
+3. Implement submission handling
+
+Files:
+- src/components/RegisterForm.js
+- src/services/auth.service.js
+```
+    
+
+## 📊 Visualization Standards
+
+### Progress Tracking Visualizations
+
+- **Component Progress**:
+    
+    ```
+    Authentication:  [███████░░░] 70%
+    User Management: [██████████] 100%
+    Data Processing: [░░░░░░░░░░] 0%
+    ```
+    
+- **Task Status**:
+    
+    ```
+    T001 ✓ | T002 ⚠️ | T003 🚧 | T004 ❌
+    ```
+    
+
+### Diagram Standards
+
+- **Architecture Diagrams**: Text-based ASCII/Unicode diagrams
+    
+    ```
+    ┌────────────┐     ┌────────────┐     ┌────────────┐
+    │   Client   │────▶│    API     │────▶│  Database  │
+    └────────────┘     └────────────┘     └────────────┘
+    ```
+    
+- **Flow Diagrams**: Sequenced process steps
+    
+    ```
+    Request ──▶ Validation ──▶ Processing ──▶ Response
+                     │
+                     ▼
+                Error Handling
+    ```
+    
+- **Entity Relationships**: Text-based relationship models
+    
+    ```
+    User (1) ────┐
+                 │
+                 ▼
+    Profile (1) ◀┘
+    ```
+    
+
+## 🔄 Development Workflow Integration
+
+### Code Quality Integration
+
+- **Link documentation** to code quality checks
+- **Track technical debt** with explicit markers
+- **Document refactoring opportunities** in dedicated section
+- **Format**:
+    
+| ID    | Description                   | Location         | Priority |
+|-------|-------------------------------|------------------|----------|
+| TD001 | Refactor auth logic           | auth.service.js  | HIGH     |
+| TD002 | Improve error handling        | api/users.js     | MEDIUM   |
+    
+
+### Implementation Strategy
+
+- **Plan-Document-Implement** workflow:
+    
+    1. Document approach and constraints
+    2. Outline implementation steps
+    3. Implement in small, testable increments
+    4. Update documentation with final approach
+- **Documentation updates** with each implementation milestone
+    
+- **Context-aware implementation** that fits conversation boundaries
+    
+
+## 🔁 Continuous Improvement Protocols
+
+- **Documentation Evolution**: Review and update structure quarterly
+- **Metric Tracking**: Monitor documentation usage and effectiveness
+- **Process Refinement**: Adjust based on project needs and feedback
+- **Knowledge Capture**: Document lessons learned and best practices
+- **Image Assets**: Always generate SVG version for assets if possible
+
+## 🛠 Development Environment Standards
+
+- **Environment Definition**:
+    
+    ```
+    ## Development Environment
+    
+    - OS: Windows with WSL2 (Ubuntu 24.04)
+    - Terminal: PowerShell and WSL Terminal
+    - Editor: Visual Studio Code
+    - Extensions: ESLint, Prettier, GitLens
+    - Container: Docker Desktop for Windows
+    - Node: v20.x
+    - Python: 3.10 ( Virtual Environment - venv )
+    ```
+    
+- **Reproducible setup** instructions
+    
+- **Development/production** environment parity documentation
+    
+
+## 📏 Code Structure Guidelines
+
+- **Modular design**: Files limited to 250 lines
+- **Function complexity**: Maximum 50 lines and 3 levels of nesting
+- **Component isolation**: Clear boundaries and responsibilities
+- **Import organization**: Standard → third-party → local
+- **Error handling**: Consistent patterns across codebase
+- **Documentation standards**: Comprehensive docstrings and comments
+- **Dependencies and Other**: Always use latest version of anything if possible like dependencies, binary, tools, and etc.
+
+## 🤖 AI Assistant Capabilities
+
+- **Contextual awareness**: Understand project history and state
+- **Assumption exposition**: Document all implementation assumptions, never use timestamp/date
+- **Alternative analysis**: Present options with pros/cons
+- **Checkpoint management**: Create state documents proactively
+- **Memory optimization**: Prioritize critical implementation details
+- **Dependency verification**: Confirm all required libraries
+- **Conversation boundary awareness**: Design tasks to fit constraints
+
+## 📝 Documentation Generation Protocol
+
+1. **Start with structure**:
+    
+    - Create skeleton with all required sections
+    - Fill high-priority sections first
+    - Add placeholders for future content
+2. **Progressive enhancement**:
+    
+    - Begin with minimal viable documentation
+    - Enhance as project complexity increases
+    - Maintain core documents at all times
+3. **Verification process**:
+    
+    - Ensure all references are valid
+    - Verify all implementation instructions
+    - Update documentation with actual implementation
+4. **Documentation placement**:
+    
+    - Store all documentation in project root
+    - Use consistent naming conventions
+    - Cross-reference between documents consistently
+
+## 🔄 Implementation Workflow
+
+1. **Task selection and breakdown**:
+    
+    - Choose highest priority task
+    - Break into subtasks if complex
+    - Document dependencies and constraints
+2. **Design and planning**:
+    
+    - Create implementation approach
+    - Document expected outcomes
+    - Define acceptance criteria
+3. **Incremental implementation**:
+    
+    - Develop in small, testable chunks
+    - Document progress continuously
+    - Create checkpoints at milestones
+4. **Review and refine**:
+    
+    - Validate against requirements
+    - Document any deviations
+    - Update relevant documentation
+
+## 📋 Documentation Templates
+
+### Minimal README.md Template
+
+````markdown
+# Project Name
+
+One-paragraph project description and purpose.
+
+## Features
+
+- Feature 1: Brief description
+- Feature 2: Brief description
+- Feature 3: Brief description
+
+## Quick Start
+
+```bash
+# Installation
+npm install
+
+# Run development server
+npm run dev
+````
+
+## Documentation
+
+- [Tasks](https://claude.ai/chat/TASK.md) - Current tasks and progress
+- [Architecture](https://claude.ai/chat/ARCHITECTURE.md) - System design and components
+- [API Specifications](https://claude.ai/chat/API-SPECS.md) - API endpoints and usage
+
+## License
+
+MIT
+
+````
+
+### Task Template
+
+```markdown
+## Task T001: {Task Name}
+
+**Goal**: {Clear objective statement}
+**Priority**: {HIGH|MEDIUM|LOW}
+**Complexity**: {SIMPLE|MEDIUM|COMPLEX}
+**Dependencies**: {List of prerequisite tasks}
+
+### Implementation Steps
+
+1. {Step 1}
+2. {Step 2}
+3. {Step 3}
+
+### Acceptance Criteria
+
+- {Criterion 1}
+- {Criterion 2}
+- {Criterion 3}
+
+### Notes
+
+{Additional context or considerations}
+````
+
+### State Checkpoint Template
+
+```markdown
+## Checkpoint CP001
+
+**Status**: {Current implementation focus}
+**Progress**: {Percentage or fraction complete}
+**Current File**: {Filename:line_number}
+
+### Component Status
+
+Component 1: [Progress visualization] XX%
+Component 2: [Progress visualization] XX%
+Component 3: [Progress visualization] XX%
+
+### Next Steps
+
+1. {Next step 1}
+2. {Next step 2}
+3. {Next step 3}
+
+### Notes
+
+{Important context for resuming work}
+```
+
+### Decision Record Template
+
+```markdown
+## Decision D001: {Decision Title}
+
+**Context**: {Situation requiring decision}
+
+**Options Considered**:
+1. {Option 1} - {Pros and cons}
+2. {Option 2} - {Pros and cons}
+3. {Option 3} - {Pros and cons}
+
+**Decision**: {Selected approach}
+
+**Consequences**: {Impacts and trade-offs}
+
+**Status**: {PROPOSED|ACCEPTED|SUPERSEDED by D00X}
+
+```

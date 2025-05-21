@@ -1,0 +1,34 @@
+{
+  "name": "siliwangisentry",
+  "version": "0.0.1",
+  "description": "Advanced Automated Pentest & Security Platform (FOSS Focused - Workspace-Centric Local)",
+  "scripts": {
+    "dev:backend": "npm run start:dev --workspace=siliwangisentry-backend",
+    "build:backend": "npm run build --workspace=siliwangisentry-backend",
+    "dev:frontend": "npm run serve --workspace=siliwangisentry-frontend",
+    "build:frontend": "npm run build --workspace=siliwangisentry-frontend",
+    "lint": "eslint . --ext .ts,.vue --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md,vue}\"",
+    "start:orchestrator": "echo \"Orchestrator start script TBD - e.g., prefect agent start\"",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "workspaces": [
+    "src/backend",
+    "src/frontend"
+  ],
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "@typescript-eslint/parser": "^7.10.0", 
+    "@typescript-eslint/eslint-plugin": "^7.10.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "eslint-plugin-vue": "^9.26.0", 
+    "prettier": "^3.3.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+} 

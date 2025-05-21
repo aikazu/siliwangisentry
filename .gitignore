@@ -1,0 +1,21 @@
+# Folders
+node_modules/
+dist/
+coverage/
+
+# Files
+.env
+*.log
+
+# Workspace (this is user-managed, but good to ignore by default)
+/workspace/tool_data/*
+!/workspace/tool_data/.gitkeep
+/workspace/reports/*
+!/workspace/reports/.gitkeep
+/workspace/platform_logs/*
+!/workspace/platform_logs/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db 
+ 
