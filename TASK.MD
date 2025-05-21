@@ -5,7 +5,7 @@ Currently working on: T007 - Develop Web Dashboard (Backend - NestJS)
 - [x] Initialize/verify NestJS project structure for backend (`src/backend`) (incl. dependencies, TypeORM & OpenSearch client setup)
 - [x] Create core modules (e.g., `WorkspacesModule`, `AssetsModule`, `ScansModule`, `FindingsModule`, `ToolRunsModule`)
 - [x] Define DTOs (Data Transfer Objects) for API requests/responses for these modules
-- [ ] Implement basic CRUD services for main entities (PostgreSQL interaction using TypeORM or similar)
+- [ ] Implement basic CRUD services for main entities (TypeORM Entities created, modules configured; services next)
 - [ ] Setup initial API controllers and endpoints (as outlined conceptually in `ARCHITECTURE.MD` for workspace, and extend for other entities)
 - [ ] Implement basic OpenSearch interaction service (e.g., for indexing findings)
 
