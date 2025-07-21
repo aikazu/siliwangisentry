@@ -25,8 +25,8 @@ Proses penyiapan dirancang agar sesederhana mungkin. Anda tidak memerlukan konfi
 ### 1. Kloning Repositori
 
 ```bash
-git clone <URL_REPOSITORI_ANDA>
-cd <NAMA_DIREKTORI>
+git clone [<URL_REPOSITORI_ANDA>](https://github.com/aikazu/siliwangisentry.git)
+cd siliwangisentry
 ```
 
 ### 2. Instal Dependensi
